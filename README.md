@@ -1,4 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌌 soulr.space — A Distributed Memex of Human Emotion
+
+**soulr.space** is a mobile-first web experience activated by NFC-enabled orbs placed in the physical world. When you tap an orb, you're invited to anonymously respond to a daily prompt and receive a random message — a "gift" — left by someone else who stood in that same spot.
+
+It's a serendipity engine.  
+A soft social network.  
+A memex of human memory, distributed across space and time.
+
+---
+
+## 🧠 Core Concept
+
+soulr.space orbs are like physical portals. Each is tied to a real-world location and accessed via NFC. When tapped, users are offered:
+
+- A **daily rotating prompt**
+- A **random gift** left by another visitor
+- The chance to **leave their own anonymous gift**
+
+Each gift becomes part of a growing, decentralized archive of thoughts, feelings, and artifacts — a kind of digital time capsule shaped by place and chance.
+
+---
+
+## 🌐 Live Routes
+
+- `soulr.space/orb/[orbId]` → The orb interaction
+
+---
 
 ## Getting Started
 
