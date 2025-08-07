@@ -2,12 +2,21 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+interface FormData {
+  meme: { url: string; image: File | null };
+  song: { title: string; link: string };
+  advice: { content: string };
+  quote: { content: string; author: string };
+  recommend: { content: string };
+  link: { url: string; caption: string };
+}
+
 export default function GiftPage() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState('meme');
   const [isSharing, setIsSharing] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     meme: { url: '', image: null },
     song: { title: '', link: '' },
     advice: { content: '' },
@@ -18,18 +27,18 @@ export default function GiftPage() {
 
   const categories = [
     { id: 'meme', label: 'Meme', icon: '😂' },
-    { id: 'song', label: 'Song', icon: '🎵' },
+    { id: 'song', label: 'Song', icon: '��' },
     { id: 'advice', label: 'Advice', icon: '💡' },
     { id: 'quote', label: 'Quote', icon: '💭' },
     { id: 'recommend', label: 'Recommend', icon: '⭐' },
     { id: 'link', label: 'Link', icon: '🔗' }
   ];
 
-  const updateFormData = (field, value) => {
+  const updateFormData = (field: string, value: string | File) => {
     setFormData(prev => ({
       ...prev,
       [selectedCategory]: {
-        ...prev[selectedCategory],
+        ...prev[selectedCategory as keyof FormData],
         [field]: value
       }
     }));
@@ -76,7 +85,7 @@ export default function GiftPage() {
             <div className="space-x-4 text-3xl">
               <span className="animate-ping">✨</span>
               <span className="animate-ping" style={{ animationDelay: '0.5s' }}>🌟</span>
-              <span className="animate-ping" style={{ animationDelay: '1s' }}>🎵</span>
+              <span className="animate-ping" style={{ animationDelay: '1s' }}>��</span>
             </div>
           </div>
         </div>
@@ -135,7 +144,7 @@ export default function GiftPage() {
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => updateFormData('image', e.target.files[0])}
+                    onChange={(e) => updateFormData('image', e.target.files?.[0] || null)}
                     className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white/20 file:text-white hover:file:bg-white/30"
                   />
                 </div>
@@ -180,8 +189,8 @@ export default function GiftPage() {
                     onChange={(e) => updateFormData('content', e.target.value)}
                     placeholder="Share your wisdom..."
                     className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 resize-none"
-                    rows="4"
-                    maxLength="500"
+                    rows={4}
+                    maxLength={500}
                   />
                   <p className="text-xs text-white/60 mt-1">
                     {formData.advice.content.length}/500 characters
@@ -200,8 +209,8 @@ export default function GiftPage() {
                       onChange={(e) => updateFormData('content', e.target.value)}
                       placeholder="Share an inspiring quote..."
                       className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 resize-none"
-                      rows="3"
-                      maxLength="300"
+                      rows={3}
+                      maxLength={300}
                     />
                   </div>
                   <div>
@@ -229,8 +238,8 @@ export default function GiftPage() {
                     onChange={(e) => updateFormData('content', e.target.value)}
                     placeholder="What would you recommend to someone?"
                     className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 resize-none"
-                    rows="4"
-                    maxLength="500"
+                    rows={4}
+                    maxLength={500}
                   />
                   <p className="text-xs text-white/60 mt-1">
                     {formData.recommend.content.length}/500 characters
@@ -286,4 +295,4 @@ export default function GiftPage() {
       </div>
     </div>
   );
-} 
+}

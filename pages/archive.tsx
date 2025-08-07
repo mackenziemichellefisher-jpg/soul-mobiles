@@ -2,9 +2,21 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
+interface Gift {
+  id: string;
+  type: string;
+  content?: string;
+  url?: string;
+  title?: string;
+  link?: string;
+  caption?: string;
+  author?: string;
+  received_at: string;
+}
+
 export default function ArchivePage() {
   const router = useRouter();
-  const [receivedGifts, setReceivedGifts] = useState([]);
+  const [receivedGifts, setReceivedGifts] = useState<Gift[]>([]);
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
@@ -17,9 +29,9 @@ export default function ArchivePage() {
     ? receivedGifts 
     : receivedGifts.filter(gift => gift.type === filter);
 
-  const getTypeIcon = (type) => {
+  const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'meme': return '';
+      case 'meme': return '😂';
       case 'song': return '🎵';
       case 'quote': return '💭';
       case 'advice': return '💡';
@@ -28,7 +40,7 @@ export default function ArchivePage() {
     }
   };
 
-  const formatDate = (timestamp) => {
+  const formatDate = (timestamp: string) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -123,4 +135,4 @@ export default function ArchivePage() {
       </div>
     </div>
   );
-} 
+}
