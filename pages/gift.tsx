@@ -16,6 +16,7 @@ export default function GiftPage() {
   const [selectedCategory, setSelectedCategory] = useState('meme');
   const [isSharing, setIsSharing] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     meme: { url: '', image: null },
     song: { title: '', link: '' },
@@ -27,7 +28,7 @@ export default function GiftPage() {
 
   const categories = [
     { id: 'meme', label: 'Meme', icon: '😂' },
-    { id: 'song', label: 'Song', icon: '��' },
+    { id: 'song', label: 'Song', icon: '' },
     { id: 'advice', label: 'Advice', icon: '💡' },
     { id: 'quote', label: 'Quote', icon: '💭' },
     { id: 'recommend', label: 'Recommend', icon: '⭐' },
@@ -48,12 +49,50 @@ export default function GiftPage() {
     setIsSharing(true);
     setShowAnimation(true);
 
-    // Simulate gift sharing process
-    setTimeout(() => {
+    try {
+      // Get current user ID
+      const userId = localStorage.getItem('soulr_user_id') || `user_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Prepare gift data
+      const giftData = {
+        type: selectedCategory,
+        content: formData[selectedCategory as keyof FormData].content || formData[selectedCategory as keyof FormData].title || '',
+        url: formData[selectedCategory as keyof FormData].url || '',
+        created_by: userId,
+        created_at: new Date().toISOString()
+      };
+
+      // Send to database
+      const response = await fetch('/api/gifts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...giftData,
+          orbId: 'void', // Default orb for void gifts
+          userId: userId
+        })
+      });
+
+      if (response.ok) {
+        // Animation plays for 3 seconds
+        setTimeout(() => {
+          setShowAnimation(false);
+          setShowSuccess(true);
+          
+          // Show success for 2 seconds then redirect
+          setTimeout(() => {
+            setShowSuccess(false);
+            router.push('/');
+          }, 2000);
+        }, 3000);
+      } else {
+        throw new Error('Failed to send gift');
+      }
+    } catch (error) {
+      console.error('Error sending gift:', error);
       setShowAnimation(false);
       setIsSharing(false);
-      router.push('/');
-    }, 3000);
+    }
   };
 
   return (
@@ -85,8 +124,19 @@ export default function GiftPage() {
             <div className="space-x-4 text-3xl">
               <span className="animate-ping">✨</span>
               <span className="animate-ping" style={{ animationDelay: '0.5s' }}>🌟</span>
-              <span className="animate-ping" style={{ animationDelay: '1s' }}>��</span>
+              <span className="animate-ping" style={{ animationDelay: '1s' }}></span>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Message */}
+      {showSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+          <div className="text-center text-white">
+            <div className="text-6xl mb-4">🎉</div>
+            <h2 className="text-2xl font-bold mb-2">Gift sent to the void!</h2>
+            <p className="text-lg">Your gift has been successfully shared</p>
           </div>
         </div>
       )}

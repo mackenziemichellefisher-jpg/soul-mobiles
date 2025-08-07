@@ -11,6 +11,8 @@ interface Gift {
   link?: string;
   caption?: string;
   author?: string;
+  created_by: string;
+  created_at: string;
 }
 
 export default function Home() {
@@ -19,8 +21,17 @@ export default function Home() {
   const [showGiftPopup, setShowGiftPopup] = useState(false);
   const [currentGift, setCurrentGift] = useState<Gift | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string>('');
 
   useEffect(() => {
+    // Generate or retrieve user ID
+    let userId = localStorage.getItem('soulr_user_id');
+    if (!userId) {
+      userId = `user_${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem('soulr_user_id', userId);
+    }
+    setCurrentUserId(userId);
+
     const container = starContainerRef.current;
     if (!container) return;
     container.innerHTML = '';
@@ -42,15 +53,12 @@ export default function Home() {
 
     // Show gift popup after a short delay
     setTimeout(() => {
-      fetchRandomGift();
+      fetchRandomGift(userId);
     }, 1000);
   }, []);
 
-  const fetchRandomGift = async () => {
+  const fetchRandomGift = async (userId: string) => {
     try {
-      // Generate a simple user ID for demo (in production, use real auth)
-      const userId = `user_${Math.random().toString(36).substr(2, 9)}`;
-      
       const response = await fetch(`/api/quantum-gift?uid=${userId}`);
       const data = await response.json();
       
@@ -69,14 +77,12 @@ export default function Home() {
     if (!currentGift) return;
     
     try {
-      const userId = `user_${Math.random().toString(36).substr(2, 9)}`;
-      
       await fetch('/api/save-gift', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           giftId: currentGift.id,
-          userId: userId,
+          userId: currentUserId,
           gift: currentGift
         })
       });
@@ -90,7 +96,7 @@ export default function Home() {
       localStorage.setItem('soulr_received_gifts', JSON.stringify(savedGifts));
 
       setShowGiftPopup(false);
-      router.push('/archive');
+      router.push('/saved');
     } catch (error) {
       console.error('Error saving gift:', error);
     }
@@ -122,10 +128,10 @@ export default function Home() {
             Gift Something
           </button>
           <button
-            onClick={() => router.push('/archive')}
+            onClick={() => router.push('/saved')}
             className="px-6 py-2 bg-white/20 border border-white/30 rounded-lg text-white hover:bg-white/30 transition-colors"
           >
-            Your Archive
+            Saved
           </button>
         </div>
         
@@ -139,6 +145,12 @@ export default function Home() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 max-w-md mx-4 border border-white/20 text-white">
             <h2 className="text-2xl font-bold mb-4">✨ You received a gift!</h2>
+            
+            {/* User IDs */}
+            <div className="mb-4 p-3 bg-white/5 rounded-lg">
+              <p className="text-xs text-white/60 mb-1">Your ID: {currentUserId}</p>
+              <p className="text-xs text-white/60">From: {currentGift.created_by}</p>
+            </div>
             
             <div className="space-y-4 mb-6">
               {currentGift.type === 'meme' && currentGift.url && (
@@ -190,7 +202,7 @@ export default function Home() {
                 onClick={saveGift}
                 className="flex-1 px-4 py-2 rounded-lg bg-purple-500/80 hover:bg-purple-600/80 transition-colors"
               >
-                Save to Archive
+                Save to Saved
               </button>
             </div>
           </div>
